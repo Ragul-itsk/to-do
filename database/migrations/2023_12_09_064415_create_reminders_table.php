@@ -17,10 +17,13 @@ return new class extends Migration
             $table->unsignedBigInteger('priority_id');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('type');
+            $table->boolean('repeat')->default(false);
+            $table->enum('type', ['daily', 'weekly', 'monthly'])->nullable();
             $table->integer('interval')->nullable();
-            $table->date('end_date')->nullable();
-            $table->dateTime('due_date');
+            $table->date('due_date')->nullable();
+            $table->date('end_date')->nullable(); 
+            $table->string('weekdays')->nullable();
+            $table->string('monthdays')->nullable(); 
             $table->foreign('reminder_category_id')->references('id')->on('reminder_categories')->onDelete('cascade');
             $table->foreign('priority_id')->references('id')->on('priorities')->onDelete('cascade');
             $table->boolean('completed')->default(false);

@@ -7,12 +7,19 @@
         data-bs-target="#reminderModal" style="z-index: 1031;">
         <i class="fas fa-plus"></i>
     </button>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <section class="vh-100 gradient-custom">
         <div class="container py-5">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col col-xl-10">
-
-
                     <div class="card bg-white">
                         <div class="card-body">
                             <form method="get" action="{{ route('reminders.index') }}" class="mb-4">
@@ -93,6 +100,23 @@
                                 <textarea name="description" class="form-control" id="description"></textarea>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="repeat">Repeat:</label>
+                                <div class="checkbox-wrapper-63">
+                                    <label class="switch">
+                                        <input type="checkbox" name="repeat" id="repeat" value="1">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="type" id="reminder-type" value="daily">
+                        <input type="hidden" name="weekdays" id="selected-weekdays" value="">
+                        <input type="hidden" name="monthdays" id="selected-monthdays" value="">
+
+                        <!-- Default to 'daily' -->
                         <div class="tab-container mt-2 mb-2">
                             <!-- Tabs for Daily, Weekly, Monthly -->
                             <nav>
@@ -215,6 +239,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log("inside DOM");
+
+            var typeInput = document.getElementById('reminder-type');
+
+            // Update hidden input based on active tab
+            document.querySelectorAll('.nav-link').forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    var type = this.getAttribute('data-bs-target').replace('#nav-', '');
+                    typeInput.value = type;
+                });
+            });
             var reminderItems = document.querySelectorAll('.reminder-item');
 
             reminderItems.forEach(function(item) {
@@ -278,8 +312,26 @@
             document.querySelectorAll('.weekday-btn').forEach(function(dayBtn) {
                 dayBtn.addEventListener('click', function() {
                     this.classList.toggle('selected'); // Toggle a class to indicate selection
+                    updateWeekdaysInput();
                 });
             });
+
+            function updateWeekdaysInput() {
+                var selectedDays = [];
+                document.querySelectorAll('.weekday-btn.selected').forEach(function(selectedBtn) {
+                    selectedDays.push(selectedBtn.textContent.trim());
+                    updateMonthdaysInput();
+                });
+                document.getElementById('selected-weekdays').value = selectedDays.join(',');
+            }
+
+            function updateMonthdaysInput() {
+                var selectedDates = [];
+                document.querySelectorAll('.calendar-day.selected').forEach(function(selectedDay) {
+                    selectedDates.push(selectedDay.textContent.trim());
+                });
+                document.getElementById('selected-monthdays').value = selectedDates.join(',');
+            }
 
 
             // Handle the selection of dates on the calendar
@@ -288,6 +340,8 @@
                     this.classList.toggle('selected'); // Toggle a class to indicate selection
                 });
             });
+
+
 
             // Toggle the end date input based on the checkbox
             var endDateToggle = document.getElementById('monthly-end-date-toggle');

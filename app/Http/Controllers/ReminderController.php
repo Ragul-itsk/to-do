@@ -19,7 +19,7 @@ class ReminderController extends Controller
         $priority = Priority::all();
         $reminder_categories = ReminderCategory::with('reminders')->where('user_id', $auth_id)->get();
         $reminders = Reminder::whereDate('due_date', $filterDate)
-        ->orderBy('created_at', 'desc')->with('reminder_category')->get();
+            ->orderBy('created_at', 'desc')->with('reminder_category')->get();
         return view('reminders.index', compact('reminders', 'reminder_categories', 'priority'));
     }
 
@@ -31,14 +31,21 @@ class ReminderController extends Controller
     public function store(Request $request)
     {
 
+
         $request->validate([
             'title' => 'required|string|max:255',
+            'repeat' => 'boolean',
             'type' => 'required|in:today,daily,weekly,monthly',
             'interval' => $request->input('type') !== 'today' ? 'nullable|numeric|min:1' : '',
             'due_date' => $request->input('type') === 'today' ? '' : 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:due_date',
+            'completed' => 'sometimes|boolean',
+            'weekdays' => 'nullable|string',
+            'monthdays' => 'nullable|string',
         ]);
 
         $auth_id = Auth::user()->id;
+
         $reminder_category = $request->category;
         $priority = $request->priority;
 
@@ -46,29 +53,47 @@ class ReminderController extends Controller
         if ($reminder_category == null) {
             $reminder_category = ReminderCategory::firstOrCreate(
                 ['user_id' => $auth_id, 'name' => 'Uncategorized']
-            );
+            )->id;
         }
         if ($priority == null) {
-            $priority = Priority::where('id', 2)->first();
+            $priority = Priority::where('id', 2)->firstOrFail()->id;
         }
+
 
         $reminderData = [
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'type' => $request->input('type'),
-            'interval' => $request->input('interval'),
-            'due_date' => $request->input('due_date'),
+            'title' => $request->title,
+            'description' => $request->description,
+            'type' => $request->type,
+            'repeat' => $request->has('repeat'),
+            'weekdays' => $request->weekdays, // This will be a comma-separated string
+            'monthdays' => $request->monthdays, // This will also be a comma-separated string
+            'interval' => $request->interval,
+            'due_date' => $request->due_date,
+            'end_date' => $request->end_date,
             'reminder_category_id' => $reminder_category,
-            'priority_id' => $priority->id,
+            'priority_id' => $priority,
+            'completed' => $request->has('completed') ? $request->completed : false,
         ];
+        
+        // Logic to handle 'type' field based on 'repeat'
+        if (!$reminderData['repeat']) {
+            // If repeat is off, set 'type' to null or a default value
+            $reminderData['type'] = null; // Or another default value
+        } else {
+            // Handle the 'type' as usual
+            $reminderData['type'] = $request->type;
+        }
 
         // Set the due_date to today if the type is 'today'
-        if ($request->input('type') === 'today') {
-            $reminderData['due_date'] = Carbon::now()->toDateString();
+        if ($request->type === 'today') {
+            $reminderData['due_date'] = Carbon::today()->toDateString();
         } else {
             // Calculate due_date based on type, interval, and end_date
+            // Assuming calculateDueDate is a method on the Reminder model that calculates the due date
             $reminderData['due_date'] = (new Reminder())->calculateDueDate($reminderData);
         }
+
+        $reminderData['user_id'] = $auth_id;
 
         Reminder::create($reminderData);
 
@@ -78,12 +103,12 @@ class ReminderController extends Controller
 
     public function updateCompletionStatus(Request $request, $id)
     {
-       
+
         $reminder = Reminder::findOrFail($id);
         $status = $request->input('isCompleted');
-        if($status == "true"){
+        if ($status == "true") {
             $status = true;
-        }else{
+        } else {
             $status = false;
         }
         $reminder->completed = $status;

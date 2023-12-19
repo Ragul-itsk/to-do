@@ -15,10 +15,13 @@ class Reminder extends Model
         'priority_id',
         'title',
         'description',
+        'repeat',
         'type',
         'interval',
         'end_date',
         'due_date',
+        'weekdays',
+        'monthdays',
         'completed'
     ];
 
