@@ -100,14 +100,122 @@
                                 <textarea name="description" class="form-control" id="description"></textarea>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <label for="repeat">Repeat:</label>
-                                <div class="checkbox-wrapper-63">
-                                    <label class="switch">
-                                        <input type="checkbox" name="repeat" id="repeat" value="1">
-                                        <span class="slider"></span>
-                                    </label>
+                        <div class="row repeat-main">
+
+                            <div class="col-md-12 repeat-col">
+
+                                <div class="repect-s1">
+                                    <h5 class="repeat-title">Repeat</h5>
+                                    <p class="repeat-text">Set a cycle for your plan</p>
+                                </div>
+
+                                <div class="repect-s2">
+                                    <div class="checkbox-wrapper-63">
+                                        <label class="switch">
+                                            <input type="checkbox" name="repeat" id="repeat" value="1">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Date Picker - initially hidden -->
+                        <div id="date-picker-container" style="display:none;">
+                            <label for="single-date">Date:</label>
+                            <input type="date" id="single-date" name="single_date" class="form-control"
+                                value="{{ \Carbon\Carbon::today()->toDateString() }}">
+                        </div>
+
+                        <!-- Repeat Tabs - initially hidden -->
+                        <div id="repeat-tabs-container" style="display:none;">
+                            <!-- Tabs for Daily, Weekly, Monthly -->
+                            <!-- Default to 'daily' -->
+                            <div class="tab-container mt-2 mb-2">
+                                <!-- Tabs for Daily, Weekly, Monthly -->
+                                <nav>
+                                    <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+                                        <button class="nav-link active" id="nav-daliy-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-daily" type="button" role="tab"
+                                            aria-controls="nav-daily" aria-selected="true">Daily</button>
+                                        <button class="nav-link" id="nav-weekly-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-weekly" type="button" role="tab"
+                                            aria-controls="nav-weekly" aria-selected="false">Weekly</button>
+                                        <button class="nav-link" id="nav-monthly-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-monthly" type="button" role="tab"
+                                            aria-controls="nav-monthly" aria-selected="false">Monthly</button>
+                                    </div>
+                                </nav>
+
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    {{-- Dail Pane --}}
+                                    <div class="tab-pane fade show active" id="nav-daily" role="tabpanel"
+                                        aria-labelledby="daily-tab">
+                                        <div class="repeat-section">
+                                            <label for="daily-interval">Interval</label>
+                                            <select id="daily-interval" class="form-control" name="interval">
+                                                @for ($i = 1; $i <= 30; $i++)
+                                                    <option value="{{ $i }}">Every {{ $i }} Day(s)
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <div class="end-date-section">
+                                            <label for="daily-end-date">End date</label>
+                                            <input type="date" name="end_date" id="daily-end-date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <!-- Weekly pane -->
+                                    <div id="nav-weekly" class="tab-pane fade">
+                                        <div class="weekdays-selector">
+                                            <!-- Weekdays buttons -->
+                                            @foreach (['S', 'M', 'T', 'W', 'T', 'F', 'S'] as $day)
+                                                <button type="button"
+                                                    class="btn btn-outline-primary weekday-btn">{{ $day }}</button>
+                                            @endforeach
+                                        </div>
+                                        <div class="interval-selector">
+                                            <label for="weekly-interval">Repeat</label>
+                                            <select id="weekly-interval" class="form-control">
+                                                <!-- Options for interval -->
+                                                @for ($i = 1; $i <= 48; $i++)
+                                                    <option value="{{ $i }}">Every {{ $i }} Week(s)
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <div class="end-date-selector">
+                                            <label for="weekly-end-date">End date</label>
+                                            <input type="date" id="weekly-end-date" class="form-control">
+                                        </div>
+                                    </div>
+                                    {{-- Monthly Pane --}}
+                                    <div class="tab-pane fade" id="nav-monthly" role="tabpanel"
+                                        aria-labelledby="monthly-tab">
+                                        <div class="calendar-section">
+                                            <!-- Simple representation of a calendar where users can click to select dates -->
+                                            <div class="calendar-grid">
+                                                @for ($i = 1; $i <= 31; $i++)
+                                                    <div class="calendar-day">{{ $i }}</div>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        <div class="repeat-section">
+                                            <label for="monthly-interval">Repeat</label>
+                                            <select id="monthly-interval" class="form-control">
+                                                @for ($i = 1; $i <= 12; $i++)
+                                                    <option value="{{ $i }}">Every {{ $i }}
+                                                        Month(s)
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <div class="end-date-section">
+                                            <label for="monthly-end-date">End date</label>
+                                            <input type="date" id="monthly-end-date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <!-- ... Daily and Monthly panes -->
                                 </div>
                             </div>
                         </div>
@@ -116,94 +224,7 @@
                         <input type="hidden" name="weekdays" id="selected-weekdays" value="">
                         <input type="hidden" name="monthdays" id="selected-monthdays" value="">
 
-                        <!-- Default to 'daily' -->
-                        <div class="tab-container mt-2 mb-2">
-                            <!-- Tabs for Daily, Weekly, Monthly -->
-                            <nav>
-                                <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-                                    <button class="nav-link active" id="nav-daliy-tab" data-bs-toggle="tab"
-                                        data-bs-target="#nav-daily" type="button" role="tab"
-                                        aria-controls="nav-daily" aria-selected="true">Daily</button>
-                                    <button class="nav-link" id="nav-weekly-tab" data-bs-toggle="tab"
-                                        data-bs-target="#nav-weekly" type="button" role="tab"
-                                        aria-controls="nav-weekly" aria-selected="false">Weekly</button>
-                                    <button class="nav-link" id="nav-monthly-tab" data-bs-toggle="tab"
-                                        data-bs-target="#nav-monthly" type="button" role="tab"
-                                        aria-controls="nav-monthly" aria-selected="false">Monthly</button>
-                                </div>
-                            </nav>
 
-                            <!-- Tab panes -->
-                            <div class="tab-content">
-                                {{-- Dail Pane --}}
-                                <div class="tab-pane fade show active" id="nav-daily" role="tabpanel"
-                                    aria-labelledby="daily-tab">
-                                    <div class="repeat-section">
-                                        <label for="daily-interval">Repeat</label>
-                                        <select id="daily-interval" class="form-control">
-                                            @for ($i = 1; $i <= 30; $i++)
-                                                <option value="{{ $i }}">Every {{ $i }} Day(s)
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <div class="end-date-section">
-                                        <label for="daily-end-date">End date</label>
-                                        <input type="date" id="daily-end-date" class="form-control">
-                                    </div>
-                                </div>
-                                <!-- Weekly pane -->
-                                <div id="nav-weekly" class="tab-pane fade">
-                                    <div class="weekdays-selector">
-                                        <!-- Weekdays buttons -->
-                                        @foreach (['S', 'M', 'T', 'W', 'T', 'F', 'S'] as $day)
-                                            <button type="button"
-                                                class="btn btn-outline-primary weekday-btn">{{ $day }}</button>
-                                        @endforeach
-                                    </div>
-                                    <div class="interval-selector">
-                                        <label for="weekly-interval">Repeat</label>
-                                        <select id="weekly-interval" class="form-control">
-                                            <!-- Options for interval -->
-                                            @for ($i = 1; $i <= 48; $i++)
-                                                <option value="{{ $i }}">Every {{ $i }} Week(s)
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <div class="end-date-selector">
-                                        <label for="weekly-end-date">End date</label>
-                                        <input type="date" id="weekly-end-date" class="form-control">
-                                    </div>
-                                </div>
-                                {{-- Monthly Pane --}}
-                                <div class="tab-pane fade" id="nav-monthly" role="tabpanel"
-                                    aria-labelledby="monthly-tab">
-                                    <div class="calendar-section">
-                                        <!-- Simple representation of a calendar where users can click to select dates -->
-                                        <div class="calendar-grid">
-                                            @for ($i = 1; $i <= 31; $i++)
-                                                <div class="calendar-day">{{ $i }}</div>
-                                            @endfor
-                                        </div>
-                                    </div>
-                                    <div class="repeat-section">
-                                        <label for="monthly-interval">Repeat</label>
-                                        <select id="monthly-interval" class="form-control">
-                                            @for ($i = 1; $i <= 12; $i++)
-                                                <option value="{{ $i }}">Every {{ $i }} Month(s)
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <div class="end-date-section">
-                                        <label for="monthly-end-date">End date</label>
-                                        <input type="date" id="monthly-end-date" class="form-control">
-                                    </div>
-                                </div>
-                                <!-- ... Daily and Monthly panes -->
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="category">Category:</label>
@@ -224,12 +245,13 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-info form-control mt-4 text-white">Add</button>
+                        <div class="modal-footer mt-4">
+
+                            {{-- <button type="submit" class="btn btn-info form-control mt-4 text-white">Add</button> --}}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Reminder</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save Reminder</button>
                 </div>
             </div>
         </div>
@@ -239,6 +261,26 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log("inside DOM");
+
+            var repeatCheckbox = document.getElementById('repeat');
+            var repeatTabsContainer = document.getElementById('repeat-tabs-container');
+            var datePickerContainer = document.getElementById('date-picker-container');
+
+            function toggleRepeatOptions() {
+                if (repeatCheckbox.checked) {
+                    repeatTabsContainer.style.display = 'block';
+                    datePickerContainer.style.display = 'none';
+                } else {
+                    repeatTabsContainer.style.display = 'none';
+                    datePickerContainer.style.display = 'block';
+                }
+            }
+
+            // Event Listener for Repeat Checkbox
+            repeatCheckbox.addEventListener('change', toggleRepeatOptions);
+
+            // Initial Check
+            toggleRepeatOptions();
 
             var typeInput = document.getElementById('reminder-type');
 

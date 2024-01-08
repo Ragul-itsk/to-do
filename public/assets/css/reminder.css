@@ -122,3 +122,17 @@
   transform: translateX(2em);
   background: lightgreen;
 }
+
+.repeat-main{
+  background: #f8fafc;
+    margin: 15px 0px 0px 0px;
+    border-radius: 5px;
+    padding: 10px 0px 0px 0px;
+    display: flex;
+}
+
+.repeat-col{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -23,7 +23,9 @@ class ReminderTableSeeder extends Seeder
                 'title' => 'Exhibit World Live',
                 'description' => 'Sample Description',
                 'type' => 'daily',
+                'interval' => '1',
                 'due_date' => $currentDate,
+                'end_date' => $currentDate,
             )
         );
 
